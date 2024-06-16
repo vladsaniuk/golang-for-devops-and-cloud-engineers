@@ -15,7 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-type ParsedResponse struct {
+type Assignment1 struct {
 	Page         string             `json:"page"`
 	Words        []string           `json:"words"`
 	Percentages  map[string]float32 `json:"percentages"`
@@ -23,7 +23,7 @@ type ParsedResponse struct {
 	ExtraSpecial []interface{}      `json:"extraSpecial"`
 }
 
-func (p ParsedResponse) GetResponse() string {
+func (p Assignment1) GetResponse() string {
 	percentages := []string{}
 	for number, percentage := range p.Percentages {
 		percentages = append(percentages, fmt.Sprintf("Number is %s, it's percentage is %v\n", number, percentage))
@@ -92,7 +92,7 @@ func (r *RequestDetails) GetToken() error {
 
 	err = json.Unmarshal(body, &retrievedToken)
 	if err != nil {
-		return fmt.Errorf("unmarshalling JSON error: %s", err)
+		return fmt.Errorf("unmarshalling token JSON error: %s", err)
 	}
 
 	r.Token = retrievedToken.Token
@@ -106,6 +106,34 @@ type Token struct {
 
 type LoginRequest struct {
 	Password string `json:"password"`
+}
+
+type Page struct {
+	Page string `json:"page"`
+}
+
+type Words struct {
+	Page  string   `json:"page"`
+	Input string   `json:"input"`
+	Words []string `json:"words"`
+}
+
+func (w Words) GetResponse() string {
+	return fmt.Sprintf("Parsed JSON:\nPage: %s\nWords: %s\nInput: %s\n", w.Page, strings.Join(w.Words, ", "), w.Input)
+}
+
+type Occurrence struct {
+	Page  string         `json:"page"`
+	Words map[string]int `json:"words"`
+}
+
+func (o Occurrence) GetResponse() string {
+	words := []string{}
+	for word, occurrence := range o.Words {
+		words = append(words, fmt.Sprintf("Word is %s, it showed up %v time", word, occurrence))
+	}
+
+	return fmt.Sprintf("Parsed JSON:\nPage: %s\nWords: %s\n", o.Page, strings.Join(words, "\n"))
 }
 
 func main() {
@@ -130,7 +158,7 @@ func main() {
 	for i := 1; i <= count; i++ {
 		getToken, err := doLogin(URL, token, password)
 		if err != nil {
-			fmt.Printf("error making login request 2: %s\n", err)
+			fmt.Printf("error making login request: %s\n", err)
 			os.Exit(1)
 		}
 
@@ -140,7 +168,11 @@ func main() {
 		if err != nil {
 			fmt.Printf("error making request: %s\n", err)
 			os.Exit(1)
+		} else if response == nil {
+			fmt.Println("Something went wrong - got nil in response")
+			os.Exit(1)
 		}
+
 		fmt.Printf("%s\n", response.GetResponse())
 
 		sum += i
@@ -173,14 +205,45 @@ func doRequest(URL, token string) (Response, error) {
 		return nil, fmt.Errorf("read response body error: %s", err)
 	}
 
-	var ParsedResponse ParsedResponse
-
-	err = json.Unmarshal(body, &ParsedResponse)
+	var page Page
+	err = json.Unmarshal(body, &page)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshalling JSON error: %s", err)
+		return nil, fmt.Errorf("unmarshalling Page JSON error: %s\nGot the following response from server: %s", err, string(body))
 	}
 
-	return ParsedResponse, nil
+	switch page.Page {
+	case "assignment1":
+		var parsedAssignment1 Assignment1
+
+		err = json.Unmarshal(body, &parsedAssignment1)
+		if err != nil {
+			return nil, fmt.Errorf("unmarshalling Assignment JSON error: %s", err)
+		}
+
+		return parsedAssignment1, nil
+
+	case "words":
+		var parsedWords Words
+
+		err = json.Unmarshal(body, &parsedWords)
+		if err != nil {
+			return nil, fmt.Errorf("unmarshalling Words JSON error: %s", err)
+		}
+
+		return parsedWords, nil
+
+	case "occurrence":
+		var parsedOccurrence Occurrence
+
+		err = json.Unmarshal(body, &parsedOccurrence)
+		if err != nil {
+			return nil, fmt.Errorf("unmarshalling Occurrence JSON error: %s", err)
+		}
+
+		return parsedOccurrence, nil
+	}
+
+	return nil, nil
 }
 
 func doLogin(URL, token, password string) (Response, error) {
