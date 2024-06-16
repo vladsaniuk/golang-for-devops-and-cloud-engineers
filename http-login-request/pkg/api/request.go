@@ -64,21 +64,19 @@ func (o Occurrence) GetResponse() string {
 	return fmt.Sprintf("Parsed JSON:\nPage: %s\nWords: %s\n", o.Page, strings.Join(words, "\n"))
 }
 
-func DoRequest(URL, token string) (Response, error) {
-	if _, err := url.ParseRequestURI(URL); err != nil {
+func DoRequest(requestDetails RequestDetails) (Response, error) {
+	if _, err := url.ParseRequestURI(requestDetails.URL); err != nil {
 		return nil, fmt.Errorf("URL is not valid: %s\nTry add -h flag", err)
 	}
 
-	client := &http.Client{}
-
-	request, err := http.NewRequest("GET", URL, nil)
+	request, err := http.NewRequest("GET", requestDetails.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("http new request error: %s", err)
 	}
 
-	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", requestDetails.Token))
 
-	response, err := client.Do(request)
+	response, err := requestDetails.Client.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("http Get error: %s", err)
 	}

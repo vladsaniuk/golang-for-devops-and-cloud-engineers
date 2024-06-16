@@ -21,6 +21,7 @@ type RequestDetails struct {
 	Token    string
 	Password string
 	URL      string
+	Client   http.Client
 }
 
 func (r RequestDetails) GetResponse() string {
@@ -43,7 +44,7 @@ func (r *RequestDetails) GetToken() error {
 		return fmt.Errorf("error marshaling password to JSON: %s", err)
 	}
 
-	response, err := http.Post(parsedURL.Scheme+"://"+parsedURL.Host+"/login", "application/json", bytes.NewBuffer(jsonBody))
+	response, err := r.Client.Post(parsedURL.Scheme+"://"+parsedURL.Host+"/login", "application/json", bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return fmt.Errorf("error making POST request: %s", err)
 	}
@@ -83,15 +84,12 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-func DoLogin(URL, token, password string) (Response, error) {
-	requestDetails := RequestDetails{
-		Token:    token,
-		Password: password,
-		URL:      URL,
-	}
-
+func DoLogin(requestDetails RequestDetails) (Response, error) {
 	if requestDetails.Token == "" {
-		requestDetails.GetToken()
+		err := requestDetails.GetToken()
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		parsedToken, _, err := new(jwt.Parser).ParseUnverified(requestDetails.Token, jwt.MapClaims{})
 		if err != nil {
@@ -111,7 +109,10 @@ func DoLogin(URL, token, password string) (Response, error) {
 		expiration := time.Unix(int64(expirationFloat64), 0)
 		if time.Now().After(expiration) {
 			fmt.Println("Token expired, do refresh")
-			requestDetails.GetToken()
+			err := requestDetails.GetToken()
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			fmt.Println("Token is still valid, re-use")
 		}

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/vladsaniuk/golang-for-devops-and-cloud-engineers/http-login-request/pkg/api"
@@ -26,17 +27,24 @@ func main() {
 		os.Exit(1)
 	}
 
+	requestDetails := api.RequestDetails{
+		Token:    token,
+		Password: password,
+		URL:      URL,
+		Client:   http.Client{},
+	}
+
 	sum := 0
 	for i := 1; i <= count; i++ {
-		getToken, err := api.DoLogin(URL, token, password)
+		getToken, err := api.DoLogin(requestDetails)
 		if err != nil {
 			fmt.Printf("error making login request: %s\n", err)
 			os.Exit(1)
 		}
 
-		token = getToken.GetResponse()
+		getToken.GetResponse()
 
-		response, err := api.DoRequest(URL, token)
+		response, err := api.DoRequest(requestDetails)
 		if err != nil {
 			fmt.Printf("error making request: %s\n", err)
 			os.Exit(1)
