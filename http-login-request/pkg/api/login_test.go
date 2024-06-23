@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// create mock HTTP response via Client and Round Tripper
 type RoundTripFunc func(req *http.Request) *http.Response
 
 func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -33,10 +34,7 @@ func TestDoLogin(t *testing.T) {
 	testClient := NewTestClient(func(req *http.Request) *http.Response {
 		return &http.Response{
 			StatusCode: 200,
-			// Send response to be tested
-			Body: io.NopCloser(bytes.NewBuffer(jsonBody)),
-			// Must be set to non-nil value or it panics
-			// Header: make(http.Header),
+			Body:       io.NopCloser(bytes.NewBuffer(jsonBody)),
 		}
 	})
 
@@ -49,12 +47,12 @@ func TestDoLogin(t *testing.T) {
 
 	getToken, err := DoLogin(requestDetails)
 	if err != nil {
-		t.Logf("error making test login request: %s\n", err)
+		t.Errorf("error making test login request: %s\n", err)
 	}
 
 	requestDetails.Token = getToken.GetResponse()
 
-	t.Logf(requestDetails.Token)
+	t.Logf("requestDetails.Token is %v\n", requestDetails.Token)
 	if requestDetails.Token != mockToken.Token {
 		t.Error("token is not correct")
 	}

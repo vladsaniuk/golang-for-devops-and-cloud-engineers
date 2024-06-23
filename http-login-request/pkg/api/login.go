@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -31,7 +32,7 @@ func (r RequestDetails) GetResponse() string {
 func (r *RequestDetails) GetToken() error {
 	parsedURL, err := url.ParseRequestURI(r.URL)
 	if err != nil {
-		fmt.Printf("error parsing request URL: %s\n", err)
+		slog.Error("error parsing request URL: " + err.Error())
 		os.Exit(1)
 	}
 
@@ -52,7 +53,7 @@ func (r *RequestDetails) GetToken() error {
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		return fmt.Errorf("error making POST request, statue code is %v", response.StatusCode)
+		return fmt.Errorf("error making POST request, status code is %v", response.StatusCode)
 	}
 
 	body, err := io.ReadAll(response.Body)
@@ -60,7 +61,7 @@ func (r *RequestDetails) GetToken() error {
 		return fmt.Errorf("read response body error: %s", err)
 	}
 
-	fmt.Printf("GetToken token request response body is: %v\n", string(body))
+	slog.Debug("GetToken token request response body is: " + string(body))
 
 	var retrievedToken Token
 
@@ -73,7 +74,7 @@ func (r *RequestDetails) GetToken() error {
 		}
 	}
 
-	fmt.Printf("GetToken retrievedToken.Token is: %v\n", retrievedToken.Token)
+	slog.Debug("GetToken retrievedToken.Token is: " + retrievedToken.Token)
 
 	r.Token = retrievedToken.Token
 
@@ -91,7 +92,7 @@ type LoginRequest struct {
 func DoLogin(requestDetails RequestDetails) (Response, error) {
 	if requestDetails.Token == "" {
 		err := requestDetails.GetToken()
-		fmt.Printf("DoLogin requestDetails.Token: %v\n", requestDetails.Token)
+		slog.Debug("DoLogin requestDetails.Token: " + requestDetails.Token)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +120,7 @@ func DoLogin(requestDetails RequestDetails) (Response, error) {
 				return nil, err
 			}
 		} else {
-			fmt.Println("Token is still valid, re-use")
+			slog.Debug("Token is still valid, re-use")
 		}
 	}
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
@@ -65,7 +66,7 @@ func (o Occurrence) GetResponse() string {
 }
 
 func DoRequest(requestDetails RequestDetails) (Response, error) {
-	fmt.Printf("DoRequest requestDetails.Token: %v\n", requestDetails.Token)
+	slog.Debug("DoRequest requestDetails.Token: " + requestDetails.Token)
 
 	if _, err := url.ParseRequestURI(requestDetails.URL); err != nil {
 		return nil, fmt.Errorf("URL is not valid: %s\nTry add -h flag", err)
@@ -78,7 +79,7 @@ func DoRequest(requestDetails RequestDetails) (Response, error) {
 
 	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", requestDetails.Token))
 
-	fmt.Printf("DoRequest request is: %v\n", request)
+	slog.Debug("DoRequest request header is: " + fmt.Sprintln(request))
 
 	response, err := requestDetails.Client.Do(request)
 	if err != nil {

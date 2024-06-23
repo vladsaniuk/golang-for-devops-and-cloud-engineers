@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -17,13 +18,23 @@ func main() {
 		count    int
 	)
 
+	// construct default logger
+	var programLevel = new(slog.LevelVar) // Info by default
+	logger := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: programLevel})
+	slog.SetDefault(slog.New(logger))
+
+	// set log level to debug, if OS env DEBUG set as 1
+	if os.Getenv("DEBUG") == "1" {
+		programLevel.Set(slog.LevelDebug)
+	}
+
 	flag.StringVar(&URL, "url", "", "URL to fetch")
 	flag.StringVar(&password, "password", "", "Password to use to get token for the API calls")
 	flag.IntVar(&count, "count", 1, "number of request")
 	flag.Parse()
 
 	if password == "" {
-		fmt.Println("Please, provide password\nTry add -h flag")
+		slog.Error("Please, provide password\nTry add -h flag")
 		os.Exit(1)
 	}
 
@@ -38,25 +49,25 @@ func main() {
 	for i := 1; i <= count; i++ {
 		getToken, err := api.DoLogin(requestDetails)
 		if err != nil {
-			fmt.Printf("error making login request: %s\n", err)
+			slog.Error("error making login request: " + err.Error())
 			os.Exit(1)
 		}
 
 		requestDetails.Token = getToken.GetResponse()
 
-		fmt.Printf("main requestDetails.Token: %v\n", requestDetails.Token)
+		slog.Debug("main requestDetails.Token: " + requestDetails.Token)
 
 		response, err := api.DoRequest(requestDetails)
-		fmt.Printf("main response: %v\n", response)
+		slog.Debug("main response: " + response.GetResponse())
 		if err != nil {
-			fmt.Printf("error making request: %s\n", err)
+			slog.Error("error making request: " + err.Error())
 			os.Exit(1)
 		} else if response == nil {
-			fmt.Println("Something went wrong - got nil in response")
+			slog.Error("Something went wrong - got nil in response")
 			os.Exit(1)
 		}
 
-		fmt.Printf("%s\n", response.GetResponse())
+		fmt.Println(response.GetResponse())
 
 		sum += i
 	}
