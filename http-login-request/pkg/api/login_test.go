@@ -52,7 +52,7 @@ func TestDoLogin(t *testing.T) {
 		t.Logf("error making test login request: %s\n", err)
 	}
 
-	getToken.GetResponse()
+	requestDetails.Token = getToken.GetResponse()
 
 	t.Logf(requestDetails.Token)
 	if requestDetails.Token != mockToken.Token {

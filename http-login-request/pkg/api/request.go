@@ -61,10 +61,12 @@ func (o Occurrence) GetResponse() string {
 		words = append(words, fmt.Sprintf("Word is %s, it showed up %v time", word, occurrence))
 	}
 
-	return fmt.Sprintf("Parsed JSON:\nPage: %s\nWords: %s\n", o.Page, strings.Join(words, "\n"))
+	return fmt.Sprintf("Parsed JSON:\nPage: %s\nWords:\n%s\n", o.Page, strings.Join(words, "\n"))
 }
 
 func DoRequest(requestDetails RequestDetails) (Response, error) {
+	fmt.Printf("DoRequest requestDetails.Token: %v\n", requestDetails.Token)
+
 	if _, err := url.ParseRequestURI(requestDetails.URL); err != nil {
 		return nil, fmt.Errorf("URL is not valid: %s\nTry add -h flag", err)
 	}
@@ -75,6 +77,8 @@ func DoRequest(requestDetails RequestDetails) (Response, error) {
 	}
 
 	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", requestDetails.Token))
+
+	fmt.Printf("DoRequest request is: %v\n", request)
 
 	response, err := requestDetails.Client.Do(request)
 	if err != nil {

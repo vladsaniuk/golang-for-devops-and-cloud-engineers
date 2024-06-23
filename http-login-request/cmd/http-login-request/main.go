@@ -42,9 +42,12 @@ func main() {
 			os.Exit(1)
 		}
 
-		getToken.GetResponse()
+		requestDetails.Token = getToken.GetResponse()
+
+		fmt.Printf("main requestDetails.Token: %v\n", requestDetails.Token)
 
 		response, err := api.DoRequest(requestDetails)
+		fmt.Printf("main response: %v\n", response)
 		if err != nil {
 			fmt.Printf("error making request: %s\n", err)
 			os.Exit(1)

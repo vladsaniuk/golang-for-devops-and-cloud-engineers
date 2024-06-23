@@ -60,6 +60,8 @@ func (r *RequestDetails) GetToken() error {
 		return fmt.Errorf("read response body error: %s", err)
 	}
 
+	fmt.Printf("GetToken token request response body is: %v\n", string(body))
+
 	var retrievedToken Token
 
 	err = json.Unmarshal(body, &retrievedToken)
@@ -70,6 +72,8 @@ func (r *RequestDetails) GetToken() error {
 			Err:      fmt.Sprintf("unmarshalling token JSON error: %s", err),
 		}
 	}
+
+	fmt.Printf("GetToken retrievedToken.Token is: %v\n", retrievedToken.Token)
 
 	r.Token = retrievedToken.Token
 
@@ -87,6 +91,7 @@ type LoginRequest struct {
 func DoLogin(requestDetails RequestDetails) (Response, error) {
 	if requestDetails.Token == "" {
 		err := requestDetails.GetToken()
+		fmt.Printf("DoLogin requestDetails.Token: %v\n", requestDetails.Token)
 		if err != nil {
 			return nil, err
 		}
