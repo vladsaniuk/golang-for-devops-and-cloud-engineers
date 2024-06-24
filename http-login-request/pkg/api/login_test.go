@@ -22,8 +22,9 @@ func NewTestClient(fn RoundTripFunc) *http.Client {
 }
 
 func TestDoLogin(t *testing.T) {
+	// mock token, that has exp in 2050
 	var mockToken = Token{
-		Token: "456",
+		Token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE3MTkyMzQ3MTIsImV4cCI6MjUzOTY4OTE1MSwiYXVkIjoiIiwic3ViIjoiIn0.nGP9jI7YzLL1tzoyeSAiH2_me3X9KYvnKlxEg90TVXg",
 	}
 
 	jsonBody, err := json.Marshal(mockToken)
@@ -45,15 +46,19 @@ func TestDoLogin(t *testing.T) {
 		Client:   *testClient,
 	}
 
-	getToken, err := DoLogin(requestDetails)
-	if err != nil {
-		t.Errorf("error making test login request: %s\n", err)
-	}
+	for i := 1; i <= 5; i++ {
+		t.Logf("Iteration %d", i)
+		getToken, err := DoLogin(requestDetails)
+		if err != nil {
+			t.Errorf("error making test login request: %s\n", err)
+		}
 
-	requestDetails.Token = getToken.GetResponse()
+		requestDetails.Token = getToken.GetResponse()
 
-	t.Logf("requestDetails.Token is %v\n", requestDetails.Token)
-	if requestDetails.Token != mockToken.Token {
-		t.Error("token is not correct")
+		t.Logf("requestDetails.Token is %v\n", requestDetails.Token)
+		if requestDetails.Token != mockToken.Token {
+			t.Error("token is not correct")
+		}
+		t.Logf("Iteration %d successfully finished", i)
 	}
 }

@@ -35,7 +35,7 @@ func TestDoRequestWords(t *testing.T) {
 	})
 
 	requestDetails := RequestDetails{
-		Token:    "456",
+		Token:    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE3MTkyMzQ3MTIsImV4cCI6MjUzOTY4OTE1MSwiYXVkIjoiIiwic3ViIjoiIn0.nGP9jI7YzLL1tzoyeSAiH2_me3X9KYvnKlxEg90TVXg",
 		Password: "123",
 		URL:      "http://transport-mock/words",
 		Client:   *testClient,
@@ -83,7 +83,7 @@ func TestDoRequestOccurrence(t *testing.T) {
 	})
 
 	requestDetails := RequestDetails{
-		Token:    "456",
+		Token:    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE3MTkyMzQ3MTIsImV4cCI6MjUzOTY4OTE1MSwiYXVkIjoiIiwic3ViIjoiIn0.nGP9jI7YzLL1tzoyeSAiH2_me3X9KYvnKlxEg90TVXg",
 		Password: "123",
 		URL:      "http://transport-mock/words",
 		Client:   *testClient,
@@ -152,7 +152,7 @@ func TestDoRequestAssignment1(t *testing.T) {
 	})
 
 	requestDetails := RequestDetails{
-		Token:    "456",
+		Token:    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE3MTkyMzQ3MTIsImV4cCI6MjUzOTY4OTE1MSwiYXVkIjoiIiwic3ViIjoiIn0.nGP9jI7YzLL1tzoyeSAiH2_me3X9KYvnKlxEg90TVXg",
 		Password: "123",
 		URL:      "http://transport-mock/words",
 		Client:   *testClient,

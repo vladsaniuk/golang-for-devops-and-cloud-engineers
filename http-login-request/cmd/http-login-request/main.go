@@ -45,7 +45,6 @@ func main() {
 		Client:   http.Client{},
 	}
 
-	sum := 0
 	for i := 1; i <= count; i++ {
 		getToken, err := api.DoLogin(requestDetails)
 		if err != nil {
@@ -68,7 +67,5 @@ func main() {
 		}
 
 		fmt.Println(response.GetResponse())
-
-		sum += i
 	}
 }
