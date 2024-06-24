@@ -6,3 +6,4 @@ Implements:
 3) http GET and POST request with added JWT token as Auth Bearer header           
 4) validating JWT token exp claim, if it still valid           
 5) package the whole thing to be modular            
+6) unit tests for all methods 
