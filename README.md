@@ -7,3 +7,9 @@ Implements:
 4) validating JWT token exp claim, if it still valid           
 5) package the whole thing to be modular            
 6) unit tests for all methods 
+
+## rate-limiting
+Implements:
+1) go routines 
+2) time ticker 
+3) send async http requests to API at a constant rate of 5 per sec
