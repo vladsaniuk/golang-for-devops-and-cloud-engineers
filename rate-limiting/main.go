@@ -34,12 +34,13 @@ func main() {
 	}()
 
 	for {
+		// select executes updates from ticker channel, until done channel get it's update, which breaks infinite loop with return
 		select {
-		case <-done:
-			fmt.Println("Done!")
+		case d := <-done:
+			slog.Info("Are we done waiting? " + fmt.Sprintf("%v", d))
 			return
 		case t := <-ticker.C:
-			fmt.Println("Current time: ", t)
+			slog.Info("Current time: " + fmt.Sprintf("%v", t))
 			sentRequest(&requestCounter)
 		}
 	}
