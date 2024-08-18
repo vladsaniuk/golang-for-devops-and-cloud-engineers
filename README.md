@@ -13,3 +13,6 @@ Implements:
 1) go routines 
 2) time ticker 
 3) send async http requests to API at a constant rate of 5 per sec
+
+## aws
+Implements some functionality for EC2 and S3 AWS services using AWS Go SDK v2 focusing on unit tests.
